@@ -27,6 +27,13 @@ export function setAttributeInner(
   // we support a single namespace by default: style
   if (ns === "style") {
     node.style.setProperty(field, value);
+    // A namespaced write is foreign relative to the `style` attribute, so it
+    // must not be treated as attribute-owned by future attribute writes.
+    // Drop it from the remembered ownership set (if any) to preserve it.
+    const owned = attributeStyles.get(node);
+    if (owned) {
+      owned.delete(field);
+    }
     return;
   }
 
